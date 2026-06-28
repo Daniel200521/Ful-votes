@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUL CampusVote - Blockchain Voting</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { --ful-blue: #4A6FA5; --white: #FFFFFF; --gold: #FFD700; --dark: #1A1A1A; --light-gray: #f5f5f5; --error: #e74c3c; --success: #27ae60; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #DCE5F5 0%, #E8E0F0 50%, #E0D8F0 100%); min-height: 100vh; }
+        .hero { background: linear-gradient(135deg, #5B7FAD 0%, #7B6FA0 50%, #6B5B95 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 40px 20px; }
+        .hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%); animation: pulse 4s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+        .hero-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; max-width: 1200px; width: 100%; gap: 60px; flex-wrap: wrap; }
+        .hero-text { flex: 1; min-width: 300px; color: var(--white); }
+        .hero-logo { width: 100px; height: 100px; margin-bottom: 25px; background: white; border-radius: 50%; padding: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .hero-logo img { width: 100%; height: 100%; object-fit: contain; }
+        .hero-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 25px; font-size: 14px; letter-spacing: 2px; margin-bottom: 20px; }
+        .hero-text h1 { font-size: 52px; font-weight: 800; margin-bottom: 10px; line-height: 1.1; }
+        .hero-text h1 .gold { color: var(--gold); }
+        .hero-text .subtitle { font-size: 18px; opacity: 0.95; margin-bottom: 30px; line-height: 1.6; }
+        .hero-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
+        .btn-hero { padding: 16px 35px; border: none; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+        .btn-hero-primary { background: var(--gold); color: var(--dark); }
+        .btn-hero-outline { background: transparent; color: var(--white); border: 2px solid var(--white); }
+        .hero-illustration { flex: 1; min-width: 300px; text-align: center; }
+        .illustration-box { background: rgba(255,255,255,0.15); border-radius: 30px; padding: 40px; border: 1px solid rgba(255,255,255,0.25); }
+        .block-icon { font-size: 80px; color: var(--gold); display: block; margin-bottom: 20px; }
+        .chain-lines { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .chain-dot { width: 20px; height: 20px; background: var(--gold); border-radius: 50%; animation: float 2s ease-in-out infinite; }
+        .chain-dot:nth-child(2) { animation-delay: 0.3s; } .chain-dot:nth-child(3) { animation-delay: 0.6s; } .chain-dot:nth-child(4) { animation-delay: 0.9s; } .chain-dot:nth-child(5) { animation-delay: 1.2s; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .illustration-text { color: var(--white); font-size: 16px; margin-top: 15px; }
+        .app-section { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #DCE5F5 0%, #E8E0F0 50%, #E0D8F0 100%); padding: 80px 20px; }
+        .app-container { background: white; width: 100%; max-width: 480px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.1); }
+        .app-header { background: linear-gradient(135deg, #5B7FAD 0%, #7B6FA0 100%); color: white; padding: 25px 20px; text-align: center; }
+        .app-header .logo-small { width: 60px; height: 60px; background: white; border-radius: 50%; padding: 8px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+        .app-header .logo-small img { width: 100%; height: 100%; object-fit: contain; }
+        .app-header .uni { font-size: 10px; letter-spacing: 2px; opacity: 0.9; text-transform: uppercase; }
+        .app-header .app-name { font-size: 24px; color: var(--gold); font-weight: bold; margin: 5px 0; }
+        .screen { padding: 25px; display: none; }
+        .screen.active { display: block; }
+        .screen-title { text-align: center; margin-bottom: 20px; font-size: 20px; color: var(--dark); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 5px; color: var(--dark); }
+        input, select { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 15px; transition: all 0.3s; background: #fafafa; }
+        input:focus, select:focus { outline: none; border-color: #7B6FA0; background: white; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; margin: 5px 0; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, #5B7FAD, #7B6FA0); color: white; }
+        .btn-gold { background: var(--gold); color: var(--dark); }
+        .btn-outline { background: white; color: #5B7FAD; border: 2px solid #5B7FAD; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; border-color: #ccc; color: #999; }
+        .message { padding: 12px 15px; border-radius: 10px; margin: 10px 0; font-size: 14px; }
+        .message-success { background: #d4edda; color: #155724; border-left: 4px solid var(--success); }
+        .message-error { background: #f8d7da; color: #721c24; border-left: 4px solid var(--error); }
+        .message-warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .message-info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+        .card { background: #f9f9f9; padding: 18px; border-radius: 12px; margin: 12px 0; border-left: 4px solid #7B6FA0; }
+        .candidate-card { border: 2px solid #e0e0e0; padding: 15px; border-radius: 12px; margin: 10px 0; cursor: pointer; transition: all 0.3s; }
+        .candidate-card:hover { border-color: #7B6FA0; }
+        .candidate-card.selected { border-color: var(--gold); background: #fffdf0; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .stat-box { text-align: center; padding: 18px; background: linear-gradient(135deg, #DCE5F5, #E8E0F0); border-radius: 12px; }
+        .stat-box .stat-number { font-size: 28px; font-weight: bold; color: #5B7FAD; }
+        .stat-box .stat-label { font-size: 11px; color: #666; margin-top: 3px; }
+        .progress-bar { height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #5B7FAD, #7B6FA0); transition: width 0.5s; }
+        .bottom-nav { display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #e0e0e0; background: white; position: sticky; bottom: 0; }
+        .nav-item { text-align: center; font-size: 11px; color: #999; padding: 5px 10px; cursor: pointer; transition: all 0.3s; border: none; background: none; }
+        .nav-item.active { color: #5B7FAD; font-weight: bold; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        .badge-container { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
+        .badge-item { min-width: 80px; background: linear-gradient(135deg, #5B7FAD, #7B6FA0); color: white; padding: 14px 10px; border-radius: 12px; text-align: center; font-size: 11px; }
+        .badge-item i { font-size: 24px; display: block; margin-bottom: 6px; }
+        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
+        .rank-icon { font-weight: bold; color: var(--gold); font-size: 18px; width: 30px; }
+        .otp-container { display: flex; gap: 10px; }
+        .otp-container input { text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 8px; }
+        .location-status { display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 10px; font-size: 13px; margin: 10px 0; }
+        .location-verified { background: #d4edda; color: #155724; }
+        .location-denied { background: #f8d7da; color: #721c24; }
+        .location-checking { background: #fff3cd; color: #856404; }
+        .live-indicator { display: inline-block; width: 10px; height: 10px; background: #27ae60; border-radius: 50%; animation: livePulse 1.5s infinite; margin-right: 5px; }
+        @keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .features-section { padding: 80px 20px; background: white; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 36px; color: var(--dark); margin-bottom: 15px; }
+        .section-header p { font-size: 18px; color: #666; max-width: 600px; margin: 0 auto; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        .feature-card { text-align: center; padding: 40px 25px; border-radius: 20px; background: linear-gradient(135deg, #DCE5F5, #E8E0F0); transition: all 0.3s; }
+        .feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(91,127,173,0.2); }
+        .feature-card i { font-size: 48px; color: #5B7FAD; margin-bottom: 20px; }
+        .feature-card h3 { font-size: 20px; margin-bottom: 10px; color: var(--dark); }
+        .feature-card p { font-size: 14px; color: #666; line-height: 1.6; }
+        .how-section { padding: 80px 20px; background: linear-gradient(135deg, #DCE5F5, #E8E0F0); }
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        .step-card { text-align: center; padding: 35px 25px; background: white; border-radius: 20px; }
+        .step-number { width: 50px; height: 50px; background: linear-gradient(135deg, #5B7FAD, #7B6FA0); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin: 0 auto 20px; }
+        .step-card h3 { font-size: 18px; margin-bottom: 10px; color: var(--dark); }
+        .step-card p { font-size: 14px; color: #666; line-height: 1.5; }
+        .footer { background: var(--dark); color: white; text-align: center; padding: 30px 20px; font-size: 14px; }
+        @media (max-width: 768px) { .hero-content { flex-direction: column; text-align: center; } .hero-logo { margin: 0 auto 25px; } .hero-text h1 { font-size: 36px; } .hero-buttons { justify-content: center; } .section-header h2 { font-size: 28px; } }
+    </style>
+</head>
+<body>
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-logo"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/4f/Federal_University_Lokoja_logo.png/220px-Federal_University_Lokoja_logo.png" alt="FUL Logo" onerror="this.parentElement.innerHTML='<div style=width:100px;height:100px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:bold;color:#5B7FAD>FUL</div>'"></div>
+                <div class="hero-badge">🔗 BLOCKCHAIN POWERED</div>
+                <h1>Federal University<br>Lokoja <span class="gold">CampusVote</span></h1>
+                <p class="subtitle">Secure, transparent, and geo-restricted voting for FUL students. Only works on campus!</p>
+                <div class="hero-buttons">
+                    <button class="btn-hero btn-hero-primary" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})"><i class="fas fa-vote-yea"></i> Vote Now</button>
+                    <button class="btn-hero btn-hero-outline" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})"><i class="fas fa-info-circle"></i> Learn More</button>
+                </div>
+            </div>
+            <div class="hero-illustration">
+                <div class="illustration-box">
+                    <i class="fas fa-cubes block-icon"></i>
+                    <div class="chain-lines"><div class="chain-dot"></div><div class="chain-dot"></div><div class="chain-dot"></div><div class="chain-dot"></div><div class="chain-dot"></div></div>
+                    <p class="illustration-text"><i class="fas fa-shield-alt"></i> Secured by Polygon Network</p>
+                    <p class="illustration-text" style="font-size:12px"><i class="fas fa-map-marker-alt"></i> Geo-Fenced to FUL Campus</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section" id="features">
+        <div class="section-header"><h2>Why Choose CampusVote?</h2><p>Built with cutting-edge technology to ensure every vote counts</p></div>
+        <div class="features-grid">
+            <div class="feature-card"><i class="fas fa-lock"></i><h3>Blockchain Security</h3><p>Every vote is encrypted and stored on the Polygon blockchain.</p></div>
+            <div class="feature-card"><i class="fas fa-map-marker-alt"></i><h3>Campus Geo-Fence</h3><p>Voting only works within FUL campus. GPS verified.</p></div>
+            <div class="feature-card"><i class="fas fa-envelope"></i><h3>Email Verification</h3><p>OTP code sent to your university email.</p></div>
+            <div class="feature-card"><i class="fas fa-bolt"></i><h3>Live Updates</h3><p>Results update in real-time as votes are cast.</p></div>
+            <div class="feature-card"><i class="fas fa-trophy"></i><h3>Earn Badges</h3><p>Get rewarded for participating in campus democracy.</p></div>
+            <div class="feature-card"><i class="fas fa-mobile-alt"></i><h3>Mobile Friendly</h3><p>Vote from any device on campus.</p></div>
+        </div>
+    </section>
+
+    <section class="how-section" id="how">
+        <div class="section-header"><h2>How It Works</h2><p>Five simple steps to cast your vote</p></div>
+        <div class="steps-grid">
+            <div class="step-card"><div class="step-number">1</div><h3><i class="fas fa-user-plus"></i> Register</h3><p>Sign up with matric number & email.</p></div>
+            <div class="step-card"><div class="step-number">2</div><h3><i class="fas fa-envelope"></i> Verify</h3><p>Enter OTP sent to your email.</p></div>
+            <div class="step-card"><div class="step-number">3</div><h3><i class="fas fa-map-marker-alt"></i> Check Location</h3><p>GPS verifies you're on campus.</p></div>
+            <div class="step-card"><div class="step-number">4</div><h3><i class="fas fa-check-circle"></i> Select</h3><p>Review candidates and choose.</p></div>
+            <div class="step-card"><div class="step-number">5</div><h3><i class="fas fa-vote-yea"></i> Vote</h3><p>Cast vote on blockchain securely!</p></div>
+        </div>
+    </section>
+
+    <section class="app-section" id="app">
+        <div class="app-container">
+            <div class="app-header">
+                <div class="logo-small"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/4f/Federal_University_Lokoja_logo.png/220px-Federal_University_Lokoja_logo.png" alt="FUL" onerror="this.innerHTML='<span style=font-size:24px;font-weight:bold;color:#5B7FAD>FUL</span>'"></div>
+                <div class="uni">Federal University Lokoja</div>
+                <div class="app-name">CampusVote</div>
+                <p style="font-size:11px;opacity:0.8"><i class="fas fa-map-marker-alt"></i> Geo-Fenced | Blockchain Secured</p>
+            </div>
+
+            <div id="loginScreen" class="screen active">
+                <h2 class="screen-title"><i class="fas fa-graduation-cap"></i> Student Login</h2>
+                <div class="form-group"><label>Matriculation Number</label><input type="text" id="matricInput" placeholder="e.g., SCI22CSC137" maxlength="12" autocomplete="off"></div>
+                <div class="form-group"><label>Password</label><input type="password" id="passwordInput" placeholder="Enter your password"></div>
+                <div id="locationStatusLogin" class="location-status location-checking"><i class="fas fa-spinner fa-spin"></i> Checking location...</div>
+                <button class="btn btn-primary" id="loginBtn" onclick="login()"><i class="fas fa-sign-in-alt"></i> Login</button>
+                <button class="btn btn-outline" onclick="showScreen('registerScreen')"><i class="fas fa-user-plus"></i> Register New Student</button>
+                <div id="loginMsg"></div>
+                <div style="text-align:center;margin-top:15px;background:#DCE5F5;padding:12px;border-radius:10px"><small>Demo: <b>SCI22CSC137</b> / password123</small><br><small style="color:#e74c3c">📍 Must be on FUL campus to vote!</small></div>
+            </div>
+
+            <div id="registerScreen" class="screen">
+                <h2 class="screen-title"><i class="fas fa-user-plus"></i> Registration</h2>
+                <div class="form-group"><label>Matriculation Number</label><input type="text" id="regMatric" placeholder="e.g., SCI22CSC137" maxlength="12" autocomplete="off"></div>
+                <div class="form-group"><label>University Email</label><input type="email" id="regEmail" placeholder="student@fulokoja.edu.ng"></div>
+                <div class="form-group"><label>Department</label><select id="regDept"><option value="">Select Department</option><option>Computer Science</option><option>Political Science</option><option>Economics</option><option>Biology</option><option>Chemistry</option><option>Physics</option><option>Mathematics</option><option>Accounting</option><option>Business Administration</option></select></div>
+                <div class="form-group"><label>Level</label><select id="regLevel"><option value="">Select Level</option><option>100</option><option>200</option><option>300</option><option>400</option></select></div>
+                <div class="form-group"><label>Create Password</label><input type="password" id="regPassword" placeholder="Minimum 6 characters"></div>
+                <button class="btn btn-primary" onclick="sendOTP()"><i class="fas fa-paper-plane"></i> Send Verification Code</button>
+                <button class="btn btn-outline" onclick="showScreen('loginScreen')"><i class="fas fa-arrow-left"></i> Back to Login</button>
+                <div id="regMsg"></div>
+            </div>
+
+            <div id="otpScreen" class="screen">
+                <h2 class="screen-title"><i class="fas fa-shield-alt"></i> Email Verification</h2>
+                <p style="text-align:center;color:#666;margin-bottom:15px">A 6-digit code has been sent to:<br><b id="otpEmailDisplay"></b></p>
+                <div class="form-group"><label>Enter Verification Code</label><input type="text" id="otpInput" placeholder="000000" maxlength="6" style="text-align:center;font-size:28px;letter-spacing:8px;font-weight:bold"></div>
+                <button class="btn btn-primary" onclick="verifyOTP()"><i class="fas fa-check"></i> Verify & Complete Registration</button>
+                <button class="btn btn-outline" onclick="showScreen('registerScreen')"><i class="fas fa-arrow-left"></i> Back</button>
+                <div id="otpMsg"></div>
+            </div>
+
+            <div id="dashboardScreen" class="screen">
+                <div id="welcomeMsg" style="text-align:center;margin-bottom:20px"></div>
+                <div id="locationStatusDash" class="location-status location-checking"><i class="fas fa-spinner fa-spin"></i> Verifying campus location...</div>
+                <div class="stats-grid">
+                    <div class="stat-box"><div class="stat-number" id="statElections">0</div><div class="stat-label">Active Elections</div></div>
+                    <div class="stat-box"><div class="stat-number" id="statVotes">0</div><div class="stat-label">Your Votes</div></div>
+                    <div class="stat-box"><div class="stat-number" id="statBadges">0</div><div class="stat-label">Badges</div></div>
+                    <div class="stat-box"><div class="stat-number" id="statPoints">0</div><div class="stat-label">Rep Points</div></div>
+                </div>
+                <h3 style="margin:20px 0 10px"><span class="live-indicator"></span> Active Elections</h3>
+                <div id="electionsList"></div>
+                <h3 style="margin:20px 0 10px"><i class="fas fa-trophy"></i> Your Badges</h3>
+                <div class="badge-container" id="badgesDisplay"></div>
+                <h3 style="margin:20px 0 10px"><i class="fas fa-medal"></i> Top Departments</h3>
+                <div id="miniLeaderboard"></div>
+            </div>
+
+            <div id="votingScreen" class="screen">
+                <h3 id="electionTitle" style="margin-bottom:15px"></h3>
+                <div id="electionInfo" class="card"></div>
+                <div id="locationStatusVote" class="location-status location-checking"><i class="fas fa-spinner fa-spin"></i> Checking campus location...</div>
+                <h4 style="margin:15px 0 10px">Select Candidate:</h4>
+                <div id="candidatesList"></div>
+                <button class="btn btn-gold" id="voteBtn" onclick="submitVote()" disabled><i class="fas fa-vote-yea"></i> CAST VOTE (Blockchain)</button>
+                <button class="btn btn-outline" onclick="showScreen('dashboardScreen')">Cancel</button>
+                <div id="voteMsg"></div>
+            </div>
+
+            <div id="resultsScreen" class="screen">
+                <h3 style="margin-bottom:15px"><span class="live-indicator"></span> Live Election Results</h3>
+                <p style="font-size:12px;color:#999;text-align:center;margin-bottom:15px"><i class="fas fa-sync-alt fa-spin"></i> Auto-refreshes every 5 seconds</p>
+                <div id="resultsContent"></div>
+                <button class="btn btn-outline" onclick="showScreen('dashboardScreen')">Back to Dashboard</button>
+            </div>
+
+            <div class="bottom-nav" id="bottomNav" style="display:none">
+                <button class="nav-item active" onclick="showScreen('dashboardScreen')"><i class="fas fa-home"></i> Home</button>
+                <button class="nav-item" onclick="showResults()"><i class="fas fa-chart-bar"></i> Results</button>
+                <button class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2024 Federal University Lokoja - CampusVote. All rights reserved.</p>
+        <p style="margin-top:5px;opacity:0.7">Powered by Polygon Blockchain | Geo-Fenced Security</p>
+    </footer>
+
+    <script>
+        let currentUser = null;
+        let selectedCandidate = null;
+        let currentElection = null;
+        let pendingRegistration = null;
+        let currentOTP = null;
+        let isOnCampus = false;
+        let liveUpdateInterval = null;
+
+        const FUL_CAMPUS = { lat: 7.8033, lng: 6.7399, radius: 2.0 };
+
+        const DB = {
+            users: {
+                'SCI22CSC137': { email: 'student@fulokoja.edu.ng', department: 'Computer Science', level: 200, password: 'password123', verified: true, votedElections: [], badges: [], reputationPoints: 0 }
+            },
+            elections: [
+                { id: 1, title: 'SUG President 2024/2025', description: 'Student Union Government Presidential Election', isActive: true, candidates: [
+                    { id: 1, name: 'Ahmed Ibrahim', dept: 'Political Science', manifesto: 'Building a united FUL community through innovation and inclusivity.', votes: 245 },
+                    { id: 2, name: 'Blessing Okonkwo', dept: 'Economics', manifesto: 'Empowering students through entrepreneurship and academic excellence.', votes: 189 },
+                    { id: 3, name: 'David Olamide', dept: 'Computer Science', manifesto: 'Digital transformation of student services and campus technology.', votes: 312 }
+                ]},
+                { id: 2, title: 'Faculty of Science Rep', description: 'Faculty of Science Representative Election', isActive: true, candidates: [
+                    { id: 4, name: 'Fatima Musa', dept: 'Biology', manifesto: 'Better lab facilities and research funding.', votes: 156 },
+                    { id: 5, name: 'Emmanuel John', dept: 'Chemistry', manifesto: 'Mentorship programs and industry partnerships.', votes: 178 }
+                ]}
+            ],
+            badges: [
+                { id: 1, name: 'First Vote', icon: 'fa-star' },
+                { id: 2, name: 'Civic Champion', icon: 'fa-trophy' },
+                { id: 3, name: 'FUL Patriot', icon: 'fa-flag' }
+            ],
+            departmentVotes: { 'Computer Science': 450, 'Political Science': 380, 'Economics': 320, 'Biology': 290, 'Chemistry': 270, 'Physics': 210, 'Mathematics': 180, 'Accounting': 350 }
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('ful_vote_final');
+            if (saved) {
+                const data = JSON.parse(saved);
+                DB.users = data.users || DB.users;
+                DB.elections = data.elections || DB.elections;
+                DB.departmentVotes = data.departmentVotes || DB.departmentVotes;
+                if (data.currentUser) { currentUser = data.currentUser; showScreen('dashboardScreen'); loadDashboard(); }
+            }
+        }
+
+        function save() {
+            localStorage.setItem('ful_vote_final', JSON.stringify({ users: DB.users, elections: DB.elections, departmentVotes: DB.departmentVotes, currentUser: currentUser }));
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            const bottomNav = document.getElementById('bottomNav');
+            if (currentUser && ['dashboardScreen','votingScreen','resultsScreen'].includes(id)) {
+                bottomNav.style.display = 'flex';
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                if (id === 'dashboardScreen') document.querySelectorAll('.nav-item')[0].classList.add('active');
+                if (id === 'resultsScreen') document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else { bottomNav.style.display = 'none'; }
+            if (id === 'dashboardScreen') { loadDashboard(); checkLocation('locationStatusDash'); startLiveUpdates(); }
+            if (id === 'votingScreen') checkLocation('locationStatusVote');
+            if (id === 'resultsScreen') { showResults(); startLiveUpdates(); }
+            if (id === 'loginScreen') stopLiveUpdates();
+            clearMessages();
+        }
+
+        function clearMessages() {
+            const msgs = ['loginMsg','regMsg','otpMsg','voteMsg'];
+            msgs.forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+        }
+
+        function validateMatric(matric) {
+            return /^[A-Z]{3}\d{2}[A-Z]{3}\d{3}$/.test(matric.toUpperCase());
+        }
+
+        function setupMatricInput(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.addEventListener('input', function() {
+                const pos = this.selectionStart;
+                this.value = this.value.toUpperCase();
+                this.setSelectionRange(pos, pos);
+            });
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2
